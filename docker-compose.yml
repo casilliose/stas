@@ -54,6 +54,5 @@ networks:
     name: php-up
     driver: bridge
     ipam:
-      driver: default
       config:
         - subnet: 192.168.245.0/28

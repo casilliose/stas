@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  nginx:
+    build: docker/nginx
+    container_name: php-up_nginx
+    volumes:
+      - ./:/var/www/php-up
+      - ./logs/nginx:/var/log/nginx
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - '${INTERFACE}:${HTTP_PORT_MACHINE}:${HTTP_PORT_DOCKER}'
+      - '${INTERFACE}:${HTTPS_PORT_MACHINE}:${HTTPS_PORT_DOCKER}'
+    depends_on:
+      - php
+    networks:
+      - php-up
+    restart: unless-stopped
+  php:
+    build: docker/php
+    container_name: php-up_php
+    volumes:
+      - ./:/var/www/php-up
+      - ./docker/php/conf.d:/usr/local/etc/php/conf.d
+    ports:
+      - '${INTERFACE}:${UPSTREAM_PORT_MACHINE}:${UPSTREAM_PORT_DOCKER}'
+    networks:
+      - php-up
+    environment:
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG}
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mysql:
+    build: docker/mysql
+    container_name: php-up_mysql
+    volumes:
+      - ./var/mysql:/var/lib/mysql
+    ports:
+      - '${INTERFACE}:${MYSQL_PORT_MACHINE}:${MYSQL_PORT_DOCKER}'
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - php-up
+    restart: unless-stopped
+
+networks:
+  php-up:
+    name: php-up
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.245.0/28

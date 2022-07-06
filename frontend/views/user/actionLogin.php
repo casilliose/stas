@@ -20,7 +20,7 @@ if (!empty($_POST['submit'])) {
         echo $errors;
     } else {
         User::auth($userId);
-        header('Location: /cabinet/');
+        header('Location: /frontend/views/cabinet/actionCabinet.php');
     }
 
     return true;

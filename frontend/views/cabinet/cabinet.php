@@ -10,7 +10,7 @@
 <div>
     <ul>
         <?php foreach ($files as $file) {
-            echo "<li>$file</li>";
+            echo "<li>" . $file['file_name'] . " <a href=''>Удалить</a>   <a href=''>Скачать</a></li>";
         } ?>
     </ul>
 </div>

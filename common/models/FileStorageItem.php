@@ -12,10 +12,13 @@ class FileStorageItem
     public static string $tableName = 'file_storage_item';
 
     /**
-     * @return string
+     * @return array
      */
-    public static function uploadFile(): string
+    public static function uploadFile(): array
     {
+        $errors = [];
+        $userId = User::checkLogged();
+
         if (!empty($_FILES) && $_FILES["filename"]["error"] == UPLOAD_ERR_OK) {
             $baseUrl = self::UPLOADS_DIR;
             $fileName = $_FILES["filename"]["name"];
@@ -28,33 +31,53 @@ class FileStorageItem
             move_uploaded_file($_FILES["filename"]["tmp_name"], $path);
 
             $db = Db::getConnection();
-            $sql = 'INSERT INTO  ' . self::$tableName . ' (base_url, path, type, name, created_at) VALUES (:base_url, :path, :type, :name, :created_at)';
+            $sql = 'INSERT INTO  ' . self::$tableName . ' (user_id, base_url, path, type, name, created_at) VALUES (:user_id, :base_url, :path, :type, :name, :created_at)';
             $result = $db->prepare($sql);
+            $result->bindParam(':user_id', $userId, \PDO::PARAM_INT);
             $result->bindParam(':base_url', $baseUrl, \PDO::PARAM_STR);
             $result->bindParam(':path', $path, \PDO::PARAM_STR);
             $result->bindParam(':type', $extension, \PDO::PARAM_STR);
             $result->bindParam(':name', $fileName, \PDO::PARAM_STR);
             $result->bindParam(':created_at', $createdAt, \PDO::PARAM_INT);
 
-            if ($result->execute()) {
-                return 'Файл "' . $fileName . '.' . $extension . '" загружен';
-            } else {
-                return 'Ошибка при вставке записи в БД!';
+            if (!$result->execute()) {
+                $errors[] = 'Ошибка при вставке записи в БД!';
             }
-        } else {
-            return 'Ошибка при загрузке файла!';
+
+            return $errors;
         }
+
+        $errors[] = 'Файл не выбран!';
+        return $errors;
     }
 
     /**
      * @return array
      */
-    public static function getFileNames(): array
+    public static function getAllFileNames(): array
     {
         $db = Db::getConnection();
 
         $files = [];
         $result = $db->query('SELECT id, name, type FROM ' . self::$tableName . ' ORDER BY id DESC');
+
+        while ($row = $result->fetch()) {
+            $files[$row['id']]['file_name'] = $row['name'] . '.' . $row['type'];
+        }
+
+        return $files;
+    }
+
+    /**
+     * @param int|null $userId
+     * @return array
+     */
+    public static function getFileNamesByUserId(int $userId = null): array
+    {
+        $db = Db::getConnection();
+
+        $files = [];
+        $result = $db->query('SELECT id, name, type FROM ' . self::$tableName . ' WHERE user_id=' . $userId . ' ORDER BY id DESC');
 
         while ($row = $result->fetch()) {
             $files[$row['id']]['file_name'] = $row['name'] . '.' . $row['type'];

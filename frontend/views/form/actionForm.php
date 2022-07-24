@@ -3,6 +3,8 @@
 require_once('../../../index.php');
 
 use common\models\FileStorageItem;
+
+$errors = FileStorageItem::uploadFile();
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +16,15 @@ use common\models\FileStorageItem;
 <body>
 <h2>Формы:</h2>
 <div>
-    <span><?php echo FileStorageItem::uploadFile(); ?></span>
+    <span>
+        <?php if (empty($errors)) {
+            echo 'Файл успешно загружен!';
+        } else {
+            foreach ($errors as $error) {
+                echo $error . '<br>';
+            }
+        } ?>
+    </span>
 </div>
 <br>
 <div>

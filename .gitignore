@@ -3,18 +3,12 @@
 
 #Composer
 /vendor
-composer.phar
 
 #IDE
 .idea
-nbproject
-.buildpath
-.project
-.settings
 
 #Logs
 /runtime
 /logs
 /var
-
-.bowerrc
+/uploads

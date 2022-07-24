@@ -116,6 +116,7 @@ class FileStorageItem
 
         if (!empty($model)) {
             $filePath = $model->path ?? '';
+            header("Content-Type: image/png");
             header("Content-Length: " . filesize($filePath));
             $quoted = sprintf('"%s"', addcslashes(basename($filePath), '"\\'));
             header("Content-Disposition: attachment; filename=$quoted");

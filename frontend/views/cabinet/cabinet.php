@@ -1,3 +1,7 @@
+<?php
+/** @var $files array */
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,8 +13,8 @@
 
 <div>
     <ul>
-        <?php foreach ($files as $file) {
-            echo "<li>" . $file['file_name'] . " <a href=''>Удалить</a>   <a href=''>Скачать</a></li>";
+        <?php foreach ($files as $id => $file) {
+            echo "<li>" . $file['file_name'] . " <a href='/frontend/views/cabinet/actionDelete.php?id=" . $id . "'>Удалить</a>   <a href='/frontend/views/cabinet/actionDownloadFile.php?id=" . $id . "'>Скачать</a></li>";
         } ?>
     </ul>
 </div>

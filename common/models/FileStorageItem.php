@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\components\Db;
+use stdClass;
 
 class FileStorageItem
 {
@@ -53,21 +54,55 @@ class FileStorageItem
         $db = Db::getConnection();
 
         $files = [];
-        $result = $db->query('SELECT name, type FROM ' . self::$tableName . ' ORDER BY id DESC');
+        $result = $db->query('SELECT id, name, type FROM ' . self::$tableName . ' ORDER BY id DESC');
 
-        $i = 0;
         while ($row = $result->fetch()) {
-            $files[$i]['file_name'] = $row['name'] . '.' . $row['type'];
-            $i++;
+            $files[$row['id']]['file_name'] = $row['name'] . '.' . $row['type'];
         }
 
         return $files;
-
     }
 
-    public static function deleteFile()
+    /**
+     * @param $id
+     * @return array
+     */
+    public static function deleteFile($id): array
     {
+        $errors = [];
+        $db = Db::getConnection();
+        $model = self::getModelById($id);
 
+        if (!empty($model)) {
+            $filePath = $model->path ?? '';
+            $result = $db->query('DELETE FROM ' . self::$tableName . ' WHERE id=' . $id);
+
+            if ($result->execute()) {
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            } else {
+                $errors[] = 'Ошибка удаления файла!';
+            }
+
+            return $errors;
+        }
+
+        $errors[] = 'Файл не найден в БД!';
+
+        return $errors;
+    }
+
+    /**
+     * @param $id
+     * @return bool|stdClass
+     */
+    public static function getModelById($id): bool|stdClass
+    {
+        $db = Db::getConnection();
+        $result = $db->query('SELECT * FROM ' . self::$tableName . ' WHERE id=' . $id);
+
+        return $result->fetchObject();
     }
 
 }

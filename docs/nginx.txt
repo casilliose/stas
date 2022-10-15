@@ -1,1 +1,5 @@
 Серверы, к которым обращается прокси Nginx, называются upstream серверами.
+
+ssl:
+https://web.dev/i18n/ru/how-to-use-local-https/
+https://github.com/FiloSottile/mkcert#installation

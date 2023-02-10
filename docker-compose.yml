@@ -12,8 +12,6 @@ services:
     ports:
       - '${INTERFACE}:${HTTP_PORT_MACHINE}:${HTTP_PORT_DOCKER}'
       - '${INTERFACE}:${HTTPS_PORT_MACHINE}:${HTTPS_PORT_DOCKER}'
-    depends_on:
-      - php
     networks:
       - php-up
     restart: unless-stopped
@@ -25,6 +23,8 @@ services:
       - ./docker/php/conf.d:/usr/local/etc/php/conf.d
     ports:
       - '${INTERFACE}:${UPSTREAM_PORT_MACHINE}:${UPSTREAM_PORT_DOCKER}'
+    depends_on:
+      - nginx
     networks:
       - php-up
     environment:
@@ -54,5 +54,6 @@ networks:
     name: php-up
     driver: bridge
     ipam:
+      driver: default
       config:
         - subnet: 192.168.245.0/28

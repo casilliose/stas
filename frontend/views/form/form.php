@@ -6,9 +6,22 @@
 </head>
 <body>
 <h2>Загрузка файла</h2>
-<form action="actionForm.php" method="post" enctype="multipart/form-data">
+<form id="form">
     Выберите файл: <input type="file" name="filename" size="10"/><br/><br/>
     <input type="submit" value="Загрузить"/>
 </form>
+
+<!-- Количество загруженных байт -->
+<p id="uploaded"></p>
+
+<!-- Прогресс-бар -->
+<p>
+    <progress max="100" value="0" id="progress"></progress>
+</p>
+
+<!-- Результат загрузки файла -->
+<p id="result"></p>
+
+<script src="../../web/js/ajax.js"></script>
 </body>
 </html>

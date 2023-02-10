@@ -2,7 +2,9 @@
 require_once('../../../index.php');
 
 use common\models\FileStorageItem;
+use common\models\User;
 
-$files = FileStorageItem::getFileNames();
+$userId = User::checkLogged() ?? null;
+$files = FileStorageItem::getFileNamesByUserId($userId);
 
 require_once('cabinet.php');

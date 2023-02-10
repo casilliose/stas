@@ -39,4 +39,15 @@ class User
         $_SESSION['user'] = $userId;
     }
 
+    /**
+     * @return mixed|void
+     */
+    public static function checkLogged()
+    {
+        session_start();
+        if (!empty($_SESSION['user'])) {
+            return $_SESSION['user'];
+        }
+    }
+
 }

@@ -105,4 +105,29 @@ class FileStorageItem
         return $result->fetchObject();
     }
 
+    /**
+     * @param $id
+     * @return array
+     */
+    public static function downloadFile($id): array
+    {
+        $errors = [];
+        $model = self::getModelById($id);
+
+        if (!empty($model)) {
+            $filePath = $model->path ?? '';
+            header("Content-Type: image/png");
+            header("Content-Length: " . filesize($filePath));
+            $quoted = sprintf('"%s"', addcslashes(basename($filePath), '"\\'));
+            header("Content-Disposition: attachment; filename=$quoted");
+            $fp = fopen($filePath, 'rb');
+            fpassthru($fp);
+
+            return $errors;
+        }
+
+        $errors[] = 'Файл не найден в БД!';
+        return $errors;
+    }
+
 }
